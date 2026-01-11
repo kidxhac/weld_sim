@@ -23,7 +23,7 @@ SCENE = {
         
         # X-minus side (bottom in diagram)  
         {"id": "R2", "side": "x_minus", "y_range": (0, 3000), "tcp_speed": 120},
-        {"id": "R4", "side": "x_minus", "y_range": (9000, 9000), "tcp_speed": 120},
+        {"id": "R4", "side": "x_minus", "y_range": (6000, 9000), "tcp_speed": 120},
     ],
 
     # Collision zones (gap between robot pairs)
