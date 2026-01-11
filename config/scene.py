@@ -13,17 +13,17 @@ SCENE = {
     "gantry": {
         "x_length": 6000.0,      # Total X-axis travel (mm)
         "x_speed": 300.0,        # Gantry speed along X (mm/s)
-        "y_span": 3000.0         # Total Y-axis span (mm)
+        "y_span": 9000.0         # Total Y-axis span (mm) - 9 meters
     },
 
     "robots": [
         # X-plus side (top in diagram)
-        {"id": "R1", "side": "x_plus", "y_range": (0, 1000), "tcp_speed": 120},
-        {"id": "R3", "side": "x_plus", "y_range": (2000, 3000), "tcp_speed": 120},
+        {"id": "R1", "side": "x_plus", "y_range": (0, 3000), "tcp_speed": 120},
+        {"id": "R3", "side": "x_plus", "y_range": (6000, 9000), "tcp_speed": 120},
         
         # X-minus side (bottom in diagram)  
-        {"id": "R2", "side": "x_minus", "y_range": (0, 1000), "tcp_speed": 120},
-        {"id": "R4", "side": "x_minus", "y_range": (2000, 3000), "tcp_speed": 120},
+        {"id": "R2", "side": "x_minus", "y_range": (0, 3000), "tcp_speed": 120},
+        {"id": "R4", "side": "x_minus", "y_range": (9000, 9000), "tcp_speed": 120},
     ],
 
     # Collision zones (gap between robot pairs)
@@ -31,8 +31,8 @@ SCENE = {
     # This is NOT a collision zone - it's a separation zone!
     # Only R3/R4 can reach this area, R1/R2 cannot
     "interference": {
-        "s1": (1000, 2000),      # Gap zone between R1-R3 (only R3 can reach)
-        "s2": (1000, 2000)       # Gap zone between R2-R4 (only R4 can reach)
+        "s1": (3000, 6000),      # Gap zone between R1-R3 (only R3 can reach)
+        "s2": (3000, 6000)       # Gap zone between R2-R4 (only R4 can reach)
     },
 
     # Weld pattern configurations for testing
@@ -41,7 +41,7 @@ SCENE = {
         "x_long": {
             "count": 4,
             "length": (1500, 3000),  # Min-max length range
-            "y_positions": [300, 700, 1300, 1700]
+            "y_positions": [1000, 3000, 5000, 7000]
         },
         
         # Short welds (SAW-suitable)

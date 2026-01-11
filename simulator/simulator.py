@@ -180,22 +180,33 @@ class Simulator:
                     robot.current_y = task.y_position
                     robot.state = RobotState.IDLE
         
-        # Phase 2: Start welding when positioned (each robot independently)
-        for task in current_window_tasks:
-            robot = self._get_robot(task.robot_id)
+        # Phase 2: Arc ignition ONLY when ALL robots positioned (NO MOVING ARC IGNITION rule)
+        # Gantry must be STOPPED during positioning and arc ignition
+        if all_positioned:
+            # All robots are now at their Y positions
+            # Check if any robot is still IDLE (hasn't ignited arc yet)
+            any_not_welding = any(
+                self._get_robot(t.robot_id).state == RobotState.IDLE and t.weld.done == 0
+                for t in current_window_tasks
+            )
             
-            # Robot can start if: (1) positioned, (2) weld not done, (3) gantry at start
-            if robot.state == RobotState.IDLE and task.weld.done == 0:
-                # Check if gantry has reached this robot's weld start
-                if self.state.gantry.x >= task.weld.x_start:
-                    # Check collision zone
-                    if self.collision_manager.try_acquire_lock(robot.id, robot.current_y):
-                        robot.state = RobotState.WELDING
-                        robot.current_weld = task.weld
-                        self.active_tasks[robot.id] = task
-                    else:
-                        robot.state = RobotState.WAIT_MUTEX
-                        self.stats['collision_waits'] += 1
+            if any_not_welding:
+                # Ignite all arcs SIMULTANEOUSLY (gantry still stopped)
+                for task in current_window_tasks:
+                    robot = self._get_robot(task.robot_id)
+                    
+                    if robot.state == RobotState.IDLE and task.weld.done == 0:
+                        # Check collision zone
+                        if self.collision_manager.try_acquire_lock(robot.id, robot.current_y):
+                            robot.state = RobotState.WELDING
+                            robot.current_weld = task.weld
+                            self.active_tasks[robot.id] = task
+                        else:
+                            robot.state = RobotState.WAIT_MUTEX
+                            self.stats['collision_waits'] += 1
+                
+                # After arc ignition, wait one step before moving gantry
+                return
         
         # Phase 3: Move gantry while welding (happens continuously at WELDING SPEED)
         if self.state.gantry.x < window_x_end:
